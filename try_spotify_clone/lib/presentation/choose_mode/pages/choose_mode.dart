@@ -7,10 +7,46 @@ import 'package:try_spotify_clone/common/widgets/button/basic_app_button.dart';
 import 'package:try_spotify_clone/core/assets/app_images.dart';
 import 'package:try_spotify_clone/core/assets/app_vectors.dart';
 import 'package:try_spotify_clone/presentation/auth/pages/signup_or_signin.dart';
-import 'package:try_spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
+import 'package:try_spotify_clone/presentation/choose_mode/bloc/animation/Button_rotaion_sun_cuibit.dart';
+import 'package:try_spotify_clone/presentation/choose_mode/bloc/animation/button_rotation_moon_cuibit.dart';
 
-class ChooseMode extends StatelessWidget {
+import 'package:try_spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
+import 'package:try_spotify_clone/presentation/choose_mode/widgets/mood_selector.dart';
+
+class ChooseMode extends StatefulWidget {
   const ChooseMode({super.key});
+
+  @override
+  State<ChooseMode> createState() => _ChooseModeState();
+}
+
+class _ChooseModeState extends State<ChooseMode> with TickerProviderStateMixin {
+  late AnimationController _controllerMoon;
+  late Animation<double> _animationMoon;
+  final double _currentAngleMoon = 0;
+  late AnimationController _controllerSun;
+  late Animation<double> _animationSun;
+  final double __currentAngleSun = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllerMoon = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1500));
+
+    _animationMoon = Tween<double>(begin: 0, end: 0).animate(_controllerMoon);
+
+    _controllerSun = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1500));
+    _animationSun = Tween<double>(begin: 0, end: 0).animate(_controllerSun);
+  }
+
+  @override
+  void dispose() {
+    _controllerMoon.dispose();
+    _controllerSun.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +72,22 @@ class ChooseMode extends StatelessWidget {
                 const Spacer(),
                 Column(
                   children: [
-                    const Text(
-                      'Choose Mode',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600),
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return const LinearGradient(
+                                colors: [Colors.red, Colors.blue],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.bottomRight)
+                            .createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: const Text(
+                        'Choose Mode',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600),
+                      ),
                     ),
                     const SizedBox(height: 25),
                     Row(
@@ -52,27 +98,18 @@ class ChooseMode extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                print(context);
+                                context
+                                    .read<ButtonRotationMoonCuibit>()
+                                    .rotation();
                                 context
                                     .read<ThemeCubit>()
                                     .updateTheme(ThemeMode.dark);
                               },
-                              child: ClipOval(
-                                child: BackdropFilter(
-                                  filter:
-                                      ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                  child: Container(
-                                    height: 80,
-                                    width: 80,
-                                    decoration: const BoxDecoration(
-                                        color: Color.fromARGB(100, 55, 46, 46),
-                                        shape: BoxShape.circle),
-                                    child: SvgPicture.asset(
-                                      AppVectors.darkMode,
-                                      fit: BoxFit.none,
-                                    ),
-                                  ),
-                                ),
+                              child: MoodSelector<ButtonRotationMoonCuibit>(
+                                controller: _controllerMoon,
+                                animation: _animationMoon,
+                                currentAngle: _currentAngleMoon,
+                                svgAssetPath: AppVectors.darkMode,
                               ),
                             ),
                             const SizedBox(height: 7),
@@ -90,26 +127,17 @@ class ChooseMode extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 context
+                                    .read<ButtonRotaionSunCuibit>()
+                                    .rotation();
+                                context
                                     .read<ThemeCubit>()
                                     .updateTheme(ThemeMode.light);
                               },
-                              child: ClipOval(
-                                child: BackdropFilter(
-                                  filter:
-                                      ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                  child: Container(
-                                    height: 80,
-                                    width: 80,
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(100, 55, 46, 46),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: SvgPicture.asset(
-                                      AppVectors.lightMode,
-                                      fit: BoxFit.none,
-                                    ),
-                                  ),
-                                ),
+                              child: MoodSelector<ButtonRotaionSunCuibit>(
+                                controller: _controllerSun,
+                                animation: _animationSun,
+                                currentAngle: __currentAngleSun,
+                                svgAssetPath: AppVectors.lightMode,
                               ),
                             ),
                             const SizedBox(height: 7),

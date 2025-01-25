@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:try_spotify_clone/core/configs/theme/app_theme.dart';
+import 'package:try_spotify_clone/presentation/choose_mode/bloc/animation/Button_rotaion_sun_cuibit.dart';
+import 'package:try_spotify_clone/presentation/choose_mode/bloc/animation/button_rotation_moon_cuibit.dart';
 import 'package:try_spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:try_spotify_clone/presentation/splash/pages/splash_page.dart';
 
@@ -24,6 +26,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (BuildContext context) => ThemeCubit()),
+        BlocProvider(create: (BuildContext context) => ButtonRotationMoonCuibit()),
+        BlocProvider(create: (BuildContext context) => ButtonRotaionSunCuibit()),
+
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
